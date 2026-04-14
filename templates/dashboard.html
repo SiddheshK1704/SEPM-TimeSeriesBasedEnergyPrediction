@@ -379,15 +379,15 @@
                 <p class="text-gray-400">Comprehensive view of energy consumption and model comparisons</p>
             </div>
             
-            <!-- Stats Cards -->
+            <!-- Stats Cards - Dynamically updated -->
             <div class="grid md:grid-cols-3 gap-6 mb-8">
                 <div class="stat-card p-6">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-gray-400">Total Energy Used</span>
                         <i class="fas fa-bolt text-blue-500 text-2xl"></i>
                     </div>
-                    <div class="heading-font text-4xl font-bold text-white" id="total-energy">38,807</div>
-                    <div class="text-sm text-gray-500 mt-2">kWh - Last 30 days</div>
+                    <div class="heading-font text-4xl font-bold text-white" id="total-energy">--</div>
+                    <div class="text-sm text-gray-500 mt-2">kWh - From uploaded data</div>
                 </div>
                 
                 <div class="stat-card p-6">
@@ -395,7 +395,7 @@
                         <span class="text-gray-400">Average Daily Usage</span>
                         <i class="fas fa-chart-line text-blue-500 text-2xl"></i>
                     </div>
-                    <div class="heading-font text-4xl font-bold text-white" id="avg-daily">4.43</div>
+                    <div class="heading-font text-4xl font-bold text-white" id="avg-daily">--</div>
                     <div class="text-sm text-gray-500 mt-2">kW per day</div>
                 </div>
                 
@@ -404,49 +404,52 @@
                         <span class="text-gray-400">Peak Consumption</span>
                         <i class="fas fa-chart-line text-blue-500 text-2xl"></i>
                     </div>
-                    <div class="heading-font text-4xl font-bold text-white" id="peak-usage">5.60</div>
+                    <div class="heading-font text-4xl font-bold text-white" id="peak-usage">--</div>
                     <div class="text-sm text-gray-500 mt-2">kW - Highest recorded</div>
                 </div>
             </div>
             
-            <!-- Model Comparison Chart -->
+            <!-- Model Comparison Chart - Dynamic -->
             <div class="glass-card p-6 mb-8">
                 <h3 class="heading-font text-xl font-semibold text-white mb-4">
                     <i class="fas fa-chart-line text-blue-500 mr-2"></i>Model Performance Comparison
                 </h3>
-                <p class="text-gray-400 text-sm mb-4">ARIMA vs RNN vs LSTM - Forecast accuracy comparison</p>
+                <p class="text-gray-400 text-sm mb-4">ARIMA vs RNN vs LSTM - Forecast accuracy comparison based on your data</p>
                 <div class="comparison-chart-container">
                     <canvas id="comparison-chart"></canvas>
                 </div>
             </div>
             
-            <!-- Additional Stats -->
+            <!-- Additional Stats - Dynamic -->
             <div class="grid md:grid-cols-2 gap-6">
                 <div class="glass-card p-6">
                     <h3 class="heading-font text-lg font-semibold text-white mb-3">
-                        <i class="fas fa-chart-pie text-blue-500 mr-2"></i>Model Accuracy
+                        <i class="fas fa-chart-pie text-blue-500 mr-2"></i>Model Accuracy (Based on your data)
                     </h3>
                     <div id="model-accuracy" class="space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-300">ARIMA</span>
-                            <div class="flex-1 mx-4 h-2 bg-gray-700 rounded-full overflow-hidden">
-                                <div class="h-full bg-blue-500 rounded-full" style="width: 85%"></div>
-                            </div>
-                            <span class="text-blue-400 font-semibold">85%</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-300">RNN</span>
-                            <div class="flex-1 mx-4 h-2 bg-gray-700 rounded-full overflow-hidden">
-                                <div class="h-full bg-green-500 rounded-full" style="width: 78%"></div>
-                            </div>
-                            <span class="text-green-400 font-semibold">78%</span>
-                        </div>
+                        <!-- LSTM (Highest Accuracy) -->
                         <div class="flex justify-between items-center">
                             <span class="text-gray-300">LSTM</span>
                             <div class="flex-1 mx-4 h-2 bg-gray-700 rounded-full overflow-hidden">
-                                <div class="h-full bg-purple-500 rounded-full" style="width: 92%"></div>
+                                <div class="h-full bg-purple-500 rounded-full accuracy-bar" data-model="lstm" style="width: 0%"></div>
                             </div>
-                            <span class="text-purple-400 font-semibold">92%</span>
+                            <span class="text-purple-400 font-semibold" id="lstm-accuracy">--</span>
+                        </div>
+                        <!-- RNN (Medium Accuracy) -->
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">RNN</span>
+                            <div class="flex-1 mx-4 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-green-500 rounded-full accuracy-bar" data-model="rnn" style="width: 0%"></div>
+                            </div>
+                            <span class="text-green-400 font-semibold" id="rnn-accuracy">--</span>
+                        </div>
+                        <!-- ARIMA (Lowest Accuracy) -->
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">ARIMA</span>
+                            <div class="flex-1 mx-4 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 rounded-full accuracy-bar" data-model="arima" style="width: 0%"></div>
+                            </div>
+                            <span class="text-blue-400 font-semibold" id="arima-accuracy">--</span>
                         </div>
                     </div>
                 </div>
@@ -455,22 +458,22 @@
                     <h3 class="heading-font text-lg font-semibold text-white mb-3">
                         <i class="fas fa-clock text-blue-500 mr-2"></i>Usage Statistics
                     </h3>
-                    <div class="space-y-2 text-gray-300">
+                    <div id="usage-stats" class="space-y-2 text-gray-300">
                         <div class="flex justify-between py-2 border-b border-gray-700">
                             <span>Peak Hour Usage:</span>
-                            <span class="text-yellow-400 font-semibold">6.2 kW (6 PM - 8 PM)</span>
+                            <span class="text-yellow-400 font-semibold" id="peak-hour">--</span>
                         </div>
                         <div class="flex justify-between py-2 border-b border-gray-700">
                             <span>Off-Peak Usage:</span>
-                            <span class="text-green-400 font-semibold">2.8 kW (12 AM - 6 AM)</span>
+                            <span class="text-green-400 font-semibold" id="offpeak-usage">--</span>
                         </div>
                         <div class="flex justify-between py-2 border-b border-gray-700">
                             <span>Weekly Average:</span>
-                            <span class="text-blue-400 font-semibold">4.15 kW</span>
+                            <span class="text-blue-400 font-semibold" id="weekly-avg">--</span>
                         </div>
                         <div class="flex justify-between py-2">
-                            <span>Monthly Trend:</span>
-                            <span class="text-red-400 font-semibold">↑ 5.2% from last month</span>
+                            <span>Data Points:</span>
+                            <span class="text-blue-400 font-semibold" id="data-points">--</span>
                         </div>
                     </div>
                 </div>
@@ -489,10 +492,23 @@
                     <i class="fas fa-sliders-h text-blue-500 mr-2"></i>Alert Configuration
                 </h3>
                 
-                <div class="space-y-4">
+                <div class="space-y-6">
                     <div>
-                        <label class="text-gray-300 block mb-2">Consumption Threshold (kW)</label>
-                        <input type="number" id="threshold-value" value="100" step="10" class="form-input w-full rounded-xl px-4 py-2 text-white">
+                        <div class="flex justify-between mb-2">
+                            <label class="text-gray-300">Consumption Threshold (kW)</label>
+                            <span class="text-blue-400 font-semibold" id="threshold-value-display">100</span>
+                        </div>
+                        <input type="range" id="threshold-slider" min="50" max="300" step="5" value="100" 
+                            class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-gray-500 text-sm mt-1">
+                            <span>50 kW</span>
+                            <span>100 kW</span>
+                            <span>150 kW</span>
+                            <span>200 kW</span>
+                            <span>250 kW</span>
+                            <span>300 kW</span>
+                        </div>
+                        <p class="text-gray-500 text-sm mt-3">You'll be notified when predicted consumption exceeds this value</p>
                     </div>
                     
                     <button onclick="setThreshold()" class="btn-primary px-6 py-2 rounded-xl text-white font-semibold">
@@ -544,12 +560,34 @@
         let recentAlerts = [];
         let historicalDataCache = null;
         
+        // Store forecasts for different models
+        let forecasts = {
+            arima: null,
+            rnn: null,
+            lstm: null
+        };
+        
+        // Store accuracy values
+        let accuracyValues = {
+            lstm: 0,
+            rnn: 0,
+            arima: 0
+        };
+        
         document.addEventListener('DOMContentLoaded', () => {
             checkAuth();
             loadThreshold();
             setupSidebarNavigation();
             loadRecentAlerts();
-            loadComparisonChart();
+            
+            // Add slider event listener
+            const slider = document.getElementById('threshold-slider');
+            const display = document.getElementById('threshold-value-display');
+            if (slider && display) {
+                slider.addEventListener('input', function() {
+                    display.textContent = this.value;
+                });
+            }
         });
         
         function setupSidebarNavigation() {
@@ -570,10 +608,253 @@
             });
             document.getElementById(`${moduleName}-module`).classList.remove('hidden');
             
-            if (moduleName === 'dashboard') {
-                loadComparisonChart();
+            if (moduleName === 'dashboard' && uploadedData) {
+                updateDashboardStats();
+                // Load all forecasts for comparison if not already loaded
+                loadAllForecastsForComparison();
             } else if (moduleName === 'alerts') {
                 loadRecentAlerts();
+            }
+        }
+        
+        async function loadAllForecastsForComparison() {
+            if (!uploadedData) return;
+            
+            showLoading();
+            
+            try {
+                // Load forecasts for all three models
+                const models = ['arima', 'rnn', 'lstm'];
+                const forecastHours = 24;
+                
+                for (const model of models) {
+                    const response = await fetch('/api/forecast', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ model_type: model, forecast_hours: forecastHours })
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        forecasts[model] = data.predictions;
+                    }
+                }
+                
+                // Update comparison chart with actual data and all forecasts
+                updateComparisonChart();
+                
+            } catch (error) {
+                console.error('Error loading forecasts:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        function updateComparisonChart() {
+            const canvas = document.getElementById('comparison-chart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            if (comparisonChart) {
+                comparisonChart.destroy();
+                comparisonChart = null;
+            }
+            
+            // Get actual historical data (last 24-48 hours)
+            let actualData = [];
+            if (historicalDataCache && historicalDataCache.length > 0) {
+                // Use last 24 hours of actual data
+                actualData = historicalDataCache.slice(-24);
+            } else if (uploadedData && uploadedData.preview) {
+                const targetCol = uploadedData.target_column;
+                if (targetCol) {
+                    actualData = uploadedData.preview.slice(-24).map(row => row[targetCol]).filter(v => v && !isNaN(v));
+                }
+            }
+            
+            // If no actual data, use sample
+            if (actualData.length === 0) {
+                actualData = [4.2, 4.5, 4.3, 4.8, 4.6, 4.9, 5.0, 4.7, 4.5, 4.4, 4.6, 4.8, 5.1, 4.9, 4.7, 4.6, 4.8, 5.0, 4.9, 4.7, 4.6, 4.5, 4.7, 4.9];
+            }
+            
+            const hours = Array.from({ length: actualData.length }, (_, i) => `Hour ${i+1}`);
+            
+            // Calculate accuracies for each model
+            if (forecasts.arima && forecasts.arima.length === actualData.length) {
+                accuracyValues.arima = calculateAccuracy(actualData, forecasts.arima);
+                document.getElementById('arima-accuracy').textContent = accuracyValues.arima + '%';
+                document.querySelector('#model-accuracy .accuracy-bar[data-model="arima"]').style.width = accuracyValues.arima + '%';
+            }
+            
+            if (forecasts.rnn && forecasts.rnn.length === actualData.length) {
+                accuracyValues.rnn = calculateAccuracy(actualData, forecasts.rnn);
+                document.getElementById('rnn-accuracy').textContent = accuracyValues.rnn + '%';
+                document.querySelector('#model-accuracy .accuracy-bar[data-model="rnn"]').style.width = accuracyValues.rnn + '%';
+            }
+            
+            if (forecasts.lstm && forecasts.lstm.length === actualData.length) {
+                accuracyValues.lstm = calculateAccuracy(actualData, forecasts.lstm);
+                document.getElementById('lstm-accuracy').textContent = accuracyValues.lstm + '%';
+                document.querySelector('#model-accuracy .accuracy-bar[data-model="lstm"]').style.width = accuracyValues.lstm + '%';
+            }
+            
+            // Prepare datasets (order: Actual, LSTM, RNN, ARIMA for better visibility)
+            const datasets = [
+                {
+                    label: 'Actual Data',
+                    data: actualData,
+                    borderColor: '#60a5fa',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2.5,
+                    pointRadius: 3,
+                    tension: 0.2,
+                    fill: false
+                }
+            ];
+            
+            // Add LSTM predictions first (highest accuracy)
+            if (forecasts.lstm && forecasts.lstm.length === actualData.length) {
+                datasets.push({
+                    label: 'LSTM Predictions',
+                    data: forecasts.lstm,
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                    borderWidth: 2.5,
+                    pointRadius: 2,
+                    tension: 0.2,
+                    fill: false
+                });
+            }
+            
+            // Add RNN predictions second
+            if (forecasts.rnn && forecasts.rnn.length === actualData.length) {
+                datasets.push({
+                    label: 'RNN Predictions',
+                    data: forecasts.rnn,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                    borderWidth: 2,
+                    pointRadius: 2,
+                    borderDash: [5, 5],
+                    tension: 0.2,
+                    fill: false
+                });
+            }
+            
+            // Add ARIMA predictions last (lowest accuracy)
+            if (forecasts.arima && forecasts.arima.length === actualData.length) {
+                datasets.push({
+                    label: 'ARIMA Predictions',
+                    data: forecasts.arima,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                    borderWidth: 2,
+                    pointRadius: 2,
+                    borderDash: [5, 5],
+                    tension: 0.2,
+                    fill: false
+                });
+            }
+            
+            comparisonChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: hours,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { color: '#e5e7eb', font: { family: 'Space Grotesk', size: 11 }, usePointStyle: true }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#60a5fa',
+                            bodyColor: '#e5e7eb',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw.toFixed(2) + ' kW';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: '#334155' },
+                            title: { display: true, text: 'Electricity Consumption (kW)', color: '#94a3b8' },
+                            ticks: { color: '#94a3b8', callback: (value) => value + ' kW' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            title: { display: true, text: 'Time (Hours)', color: '#94a3b8' },
+                            ticks: { color: '#94a3b8', maxRotation: 45, minRotation: 45 }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function calculateAccuracy(actual, predicted) {
+            if (!actual || !predicted || actual.length === 0) return 0;
+            const mape = actual.reduce((sum, val, i) => {
+                return sum + Math.abs((val - predicted[i]) / (val + 0.001));
+            }, 0) / actual.length;
+            const accuracy = Math.max(0, 100 - (mape * 100));
+            // Round to nearest integer
+            return Math.round(accuracy);
+        }
+        
+        function updateDashboardStats() {
+            if (!uploadedData || !uploadedData.preview) return;
+            
+            const targetCol = uploadedData.target_column;
+            if (!targetCol) return;
+            
+            // Get all values from the uploaded data (use full dataset if available, otherwise preview)
+            let allValues = [];
+            
+            // Try to get more data points from session if available
+            if (historicalDataCache && historicalDataCache.length > 0) {
+                allValues = historicalDataCache;
+            } else {
+                // Fallback to preview data
+                allValues = uploadedData.preview.map(row => row[targetCol]).filter(v => v && !isNaN(v));
+            }
+            
+            if (allValues.length > 0) {
+                // Calculate total energy (sum of all values * hours if hourly data)
+                const totalSum = allValues.reduce((a, b) => a + b, 0);
+                const totalKWh = Math.round(totalSum);
+                const avgDaily = (totalSum / allValues.length).toFixed(2);
+                const peakUsage = Math.max(...allValues).toFixed(2);
+                
+                document.getElementById('total-energy').textContent = totalKWh.toLocaleString();
+                document.getElementById('avg-daily').textContent = avgDaily;
+                document.getElementById('peak-usage').textContent = peakUsage;
+                
+                // Calculate peak hour (find max value and its position)
+                const maxIndex = allValues.indexOf(Math.max(...allValues));
+                const peakHourLabel = `${(maxIndex % 24) + 1}:00`;
+                document.getElementById('peak-hour').textContent = `${peakUsage} kW (${peakHourLabel})`;
+                
+                // Calculate off-peak average (12 AM - 6 AM)
+                const offPeakValues = allValues.filter((_, i) => (i % 24) < 6);
+                const offPeakAvg = offPeakValues.length > 0 ? (offPeakValues.reduce((a, b) => a + b, 0) / offPeakValues.length).toFixed(2) : '0';
+                document.getElementById('offpeak-usage').textContent = `${offPeakAvg} kW`;
+                
+                // Calculate weekly average
+                const weeklyAvg = (totalSum / allValues.length).toFixed(2);
+                document.getElementById('weekly-avg').textContent = `${weeklyAvg} kW`;
+                
+                // Data points count
+                document.getElementById('data-points').textContent = uploadedData.row_count || allValues.length;
             }
         }
         
@@ -635,6 +916,7 @@
                     document.getElementById('upload-status').innerHTML = `<div class="text-green-500"><i class="fas fa-check-circle mr-2"></i>${data.message}</div>`;
                     showDataPreview(data.preview, data.columns);
                     showToast('File uploaded successfully!', 'success');
+                    updateDashboardStats();
                 } else {
                     document.getElementById('upload-status').innerHTML = `<div class="text-red-500"><i class="fas fa-exclamation-circle mr-2"></i>${data.message}</div>`;
                     showToast(data.message, 'error');
@@ -689,6 +971,9 @@
                     updateForecastChart(data.historical, data.predictions, data.timestamps);
                     await getRecommendations(data.predictions);
                     
+                    // Store historical data for dashboard
+                    historicalDataCache = data.historical.values;
+                    
                     const maxPrediction = Math.max(...data.predictions);
                     if (maxPrediction > alertThreshold) {
                         addAlert(`⚠️ Alert: Predicted consumption (${maxPrediction.toFixed(2)} kW) exceeds threshold (${alertThreshold} kW)!`);
@@ -733,12 +1018,10 @@
             // Store historical data for comparison chart
             historicalDataCache = historicalValues;
             
-            // Create labels
             const historicalLabels = historicalValues.map((_, i) => i);
             const predictionLabels = predictionValues.map((_, i) => historicalValues.length + i);
             const allLabels = [...historicalLabels, ...predictionLabels];
             
-            // Create data arrays with overlapping
             const historicalData = [...historicalValues, ...Array(predictionValues.length).fill(null)];
             const predictionData = [...Array(historicalValues.length).fill(null), ...predictionValues];
             
@@ -817,107 +1100,6 @@
             });
         }
         
-        function loadComparisonChart() {
-            const canvas = document.getElementById('comparison-chart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            if (comparisonChart) {
-                comparisonChart.destroy();
-                comparisonChart = null;
-            }
-            
-            // Sample data for model comparison
-            const actualData = [4.2, 4.5, 4.3, 4.8, 4.6, 4.9, 5.0, 4.7, 4.5, 4.4, 4.6, 4.8, 5.1, 4.9, 4.7, 4.6, 4.8, 5.0, 4.9, 4.7, 4.6, 4.5, 4.7, 4.9];
-            const arimaPredictions = [4.3, 4.6, 4.4, 4.7, 4.5, 4.8, 4.9, 4.6, 4.4, 4.3, 4.5, 4.7, 4.9, 4.8, 4.6, 4.5, 4.7, 4.9, 4.8, 4.6, 4.5, 4.4, 4.6, 4.8];
-            const rnnPredictions = [4.1, 4.3, 4.2, 4.5, 4.3, 4.6, 4.7, 4.4, 4.2, 4.1, 4.3, 4.5, 4.7, 4.6, 4.4, 4.3, 4.5, 4.7, 4.6, 4.4, 4.3, 4.2, 4.4, 4.6];
-            const lstmPredictions = [4.2, 4.5, 4.3, 4.8, 4.6, 4.9, 5.0, 4.7, 4.5, 4.4, 4.6, 4.8, 5.0, 4.9, 4.7, 4.6, 4.8, 5.0, 4.9, 4.7, 4.6, 4.5, 4.7, 4.9];
-            
-            const hours = Array.from({ length: 24 }, (_, i) => `Hour ${i+1}`);
-            
-            comparisonChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: hours,
-                    datasets: [
-                        {
-                            label: 'Actual Data',
-                            data: actualData,
-                            borderColor: '#60a5fa',
-                            backgroundColor: 'transparent',
-                            borderWidth: 2.5,
-                            pointRadius: 2,
-                            tension: 0.2,
-                            fill: false
-                        },
-                        {
-                            label: 'ARIMA Predictions',
-                            data: arimaPredictions,
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.05)',
-                            borderWidth: 2,
-                            pointRadius: 2,
-                            borderDash: [5, 5],
-                            tension: 0.2,
-                            fill: false
-                        },
-                        {
-                            label: 'RNN Predictions',
-                            data: rnnPredictions,
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.05)',
-                            borderWidth: 2,
-                            pointRadius: 2,
-                            borderDash: [5, 5],
-                            tension: 0.2,
-                            fill: false
-                        },
-                        {
-                            label: 'LSTM Predictions',
-                            data: lstmPredictions,
-                            borderColor: '#8b5cf6',
-                            backgroundColor: 'rgba(139, 92, 246, 0.05)',
-                            borderWidth: 2.5,
-                            pointRadius: 2,
-                            tension: 0.2,
-                            fill: false
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: { color: '#e5e7eb', font: { family: 'Space Grotesk', size: 11 }, usePointStyle: true }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                            titleColor: '#60a5fa',
-                            bodyColor: '#e5e7eb',
-                            borderColor: '#3b82f6',
-                            borderWidth: 1
-                        }
-                    },
-                    scales: {
-                        y: {
-                            grid: { color: '#334155' },
-                            title: { display: true, text: 'Electricity Consumption (kW)', color: '#94a3b8' },
-                            ticks: { color: '#94a3b8', callback: (value) => value + ' kW' }
-                        },
-                        x: {
-                            grid: { display: false },
-                            title: { display: true, text: 'Time (Hours)', color: '#94a3b8' },
-                            ticks: { color: '#94a3b8', maxRotation: 45, minRotation: 45 }
-                        }
-                    }
-                }
-            });
-        }
-        
         async function getRecommendations(predictions) {
             const avgConsumption = predictions.reduce((a, b) => a + b, 0) / predictions.length;
             
@@ -957,10 +1139,11 @@
         }
         
         function setThreshold() {
-            const value = parseInt(document.getElementById('threshold-value').value);
-            if (!isNaN(value) && value > 0) {
+            const value = parseInt(document.getElementById('threshold-slider').value);
+            if (!isNaN(value) && value >= 50 && value <= 300) {
                 alertThreshold = value;
                 localStorage.setItem('alert_threshold', value);
+                document.getElementById('threshold-value-display').textContent = value;
                 document.getElementById('alert-status').innerHTML = `<div class="text-green-500"><i class="fas fa-check-circle mr-1"></i>Alert threshold set to ${value} kW</div>`;
                 showToast(`Alert threshold set to ${value} kW`, 'success');
                 setTimeout(() => {
@@ -1004,8 +1187,12 @@
             const saved = localStorage.getItem('alert_threshold');
             if (saved) {
                 alertThreshold = parseInt(saved);
-                const thresholdInput = document.getElementById('threshold-value');
-                if (thresholdInput) thresholdInput.value = alertThreshold;
+                const slider = document.getElementById('threshold-slider');
+                const display = document.getElementById('threshold-value-display');
+                if (slider) {
+                    slider.value = alertThreshold;
+                    if (display) display.textContent = alertThreshold;
+                }
             }
         }
         
