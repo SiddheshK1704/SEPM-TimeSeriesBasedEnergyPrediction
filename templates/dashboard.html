@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Energy Forecast Platform</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        h1, h2, h3, h4, h5, h6, .heading-font, .bitcount-font {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            border-right: 1px solid rgba(59, 130, 246, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .sidebar-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .sidebar-item:hover::before {
+            left: 100%;
+        }
+        
+        .sidebar-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: #3b82f6;
+            transform: translateX(5px);
+        }
+        
+        .sidebar-item.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-left-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+        }
+        
+        /* Glass Card Effect */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+        }
+        
+        /* Form Inputs */
+        .form-input {
+            background: rgba(51, 65, 85, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            transform: scale(1.02);
+        }
+        
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+            transform: scale(1.02);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            border: 3px solid rgba(59, 130, 246, 0.2);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #60a5fa;
+        }
+        
+        /* Content Area */
+        .content-area {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+        }
+        
+        /* Stat Card */
+        .stat-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        
+        .comparison-chart-container {
+            position: relative;
+            height: 450px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="content-area">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar fixed left-0 top-0 h-full w-64 z-40 overflow-y-auto">
+        <div class="p-6">
+            <!-- Logo - Clickable to go to landing page -->
+            <div class="flex items-center space-x-2 mb-10 cursor-pointer group" onclick="window.location.href='/'">
+                <i class="fas fa-bolt text-blue-500 text-2xl group-hover:animate-pulse-slow group-hover:rotate-12 transition-transform"></i>
+                <span class="heading-font text-lg font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent group-hover:from-blue-300 group-hover:to-blue-500 transition-all">
+                    EnergyForecast
+                </span>
+            </div>
+            
+            <nav class="space-y-2">
+                <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer" data-module="upload">
+                    <i class="fas fa-cloud-upload-alt w-6 text-blue-400"></i>
+                    <span class="ml-3 text-gray-300">Upload Data</span>
+                </div>
+                
+                <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer" data-module="forecast">
+                    <i class="fas fa-chart-line w-6 text-blue-400"></i>
+                    <span class="ml-3 text-gray-300">Forecast Engine</span>
+                </div>
+                
+                <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer" data-module="dashboard">
+                    <i class="fas fa-chart-pie w-6 text-blue-400"></i>
+                    <span class="ml-3 text-gray-300">Visualization Dashboard</span>
+                </div>
+                
+                <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer" data-module="alerts">
+                    <i class="fas fa-bell w-6 text-blue-400"></i>
+                    <span class="ml-3 text-gray-300">Alerts & Notifications</span>
+                </div>
+                
+                <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer" data-module="recommendations">
+                    <i class="fas fa-lightbulb w-6 text-blue-400"></i>
+                    <span class="ml-3 text-gray-300">Recommendations</span>
+                </div>
+            </nav>
+            
+            <div class="absolute bottom-8 left-0 right-0 px-6">
+                <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer" onclick="logout()">
+                    <i class="fas fa-sign-out-alt w-6 text-red-400"></i>
+                    <span class="ml-3 text-red-400">Logout</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="ml-64 p-8">
+        <!-- Upload Module -->
+        <div id="upload-module" class="module-content animate-fadeIn hidden">
+            <div class="mb-8">
+                <h2 class="heading-font text-4xl font-bold text-white mb-2">Upload Data</h2>
+                <p class="text-gray-400">Upload your energy consumption dataset in CSV format</p>
+            </div>
+            
+            <div class="glass-card p-8">
+                <div class="upload-area rounded-xl p-12 text-center cursor-pointer" onclick="document.getElementById('file-input').click()">
+                    <i class="fas fa-cloud-upload-alt text-6xl text-blue-500 mb-4 animate-pulse-slow"></i>
+                    <p class="text-gray-300 text-lg mb-2">Click or drag and drop to upload CSV file</p>
+                    <p class="text-gray-500 text-sm">File should contain "Electricity:Facility [kW](Hourly)" column</p>
+                    <input type="file" id="file-input" accept=".csv" class="hidden" onchange="uploadFile(this.files[0])">
+                </div>
+                <div id="upload-status" class="mt-4 hidden"></div>
+                <div id="data-preview" class="mt-6 hidden">
+                    <h3 class="heading-font text-lg font-semibold text-white mb-3">Data Preview</h3>
+                    <div class="overflow-x-auto rounded-xl">
+                        <table class="text-sm text-gray-300 w-full">
+                            <thead id="preview-head" class="bg-slate-800"></thead>
+                            <tbody id="preview-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Forecast Module -->
+        <div id="forecast-module" class="module-content animate-fadeIn hidden">
+            <div class="mb-8">
+                <h2 class="heading-font text-4xl font-bold text-white mb-2">Forecast Engine</h2>
+                <p class="text-gray-400">Select a model and generate energy consumption forecasts</p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-6 mb-8">
+                <div class="glass-card p-6">
+                    <h3 class="heading-font text-xl font-semibold text-white mb-4">
+                        <i class="fas fa-brain text-blue-500 mr-2"></i>Model Configuration
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-gray-300 block mb-2">Select Forecasting Model</label>
+                            <select id="model-select" class="form-input w-full rounded-xl px-4 py-2 text-white">
+                                <option value="arima">ARIMA (Statistical Model)</option>
+                                <option value="rnn">RNN (Recurrent Neural Network)</option>
+                                <option value="lstm">LSTM (Long Short-Term Memory)</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="text-gray-300 block mb-2">Forecast Horizon (Hours)</label>
+                            <input type="number" id="forecast-hours" value="24" min="1" max="168" class="form-input w-full rounded-xl px-4 py-2 text-white">
+                        </div>
+                        
+                        <button onclick="runForecast()" id="forecast-btn" class="btn-primary w-full py-3 rounded-xl text-white font-semibold">
+                            <i class="fas fa-chart-line mr-2"></i>Generate Forecast
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="glass-card p-6">
+                    <h3 class="heading-font text-xl font-semibold text-white mb-4">
+                        <i class="fas fa-chart-bar text-blue-500 mr-2"></i>Performance Metrics
+                    </h3>
+                    <div id="metrics" class="space-y-3">
+                        <div class="flex justify-between text-gray-300 py-2 border-b border-gray-700">
+                            <span>MAE (Mean Absolute Error):</span>
+                            <span id="metric-mae" class="heading-font text-blue-400 font-semibold">--</span>
+                        </div>
+                        <div class="flex justify-between text-gray-300 py-2 border-b border-gray-700">
+                            <span>RMSE (Root Mean Square Error):</span>
+                            <span id="metric-rmse" class="heading-font text-blue-400 font-semibold">--</span>
+                        </div>
+                        <div class="flex justify-between text-gray-300 py-2 border-b border-gray-700">
+                            <span>MAPE (Mean Absolute Percentage Error):</span>
+                            <span id="metric-mape" class="heading-font text-blue-400 font-semibold">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-card p-6">
+                <h3 class="heading-font text-xl font-semibold text-white mb-4">
+                    <i class="fas fa-chart-line text-blue-500 mr-2"></i>Forecast Visualization (Actual vs Predicted)
+                </h3>
+                <div class="chart-container">
+                    <canvas id="forecast-chart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Visualization Dashboard Module -->
+        <div id="dashboard-module" class="module-content animate-fadeIn hidden">
+            <div class="mb-8">
+                <h2 class="heading-font text-4xl font-bold text-white mb-2">Visualization Dashboard</h2>
+                <p class="text-gray-400">Comprehensive view of energy consumption and model comparisons</p>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="stat-card p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-400">Total Energy Used</span>
+                        <i class="fas fa-bolt text-blue-500 text-2xl"></i>
+                    </div>
+                    <div class="heading-font text-4xl font-bold text-white" id="total-energy">38,807</div>
+                    <div class="text-sm text-gray-500 mt-2">kWh - Last 30 days</div>
+                </div>
+                
+                <div class="stat-card p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-400">Average Daily Usage</span>
+                        <i class="fas fa-chart-line text-blue-500 text-2xl"></i>
+                    </div>
+                    <div class="heading-font text-4xl font-bold text-white" id="avg-daily">4.43</div>
+                    <div class="text-sm text-gray-500 mt-2">kW per day</div>
+                </div>
+                
+                <div class="stat-card p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-400">Peak Consumption</span>
+                        <i class="fas fa-chart-line text-blue-500 text-2xl"></i>
+                    </div>
+                    <div class="heading-font text-4xl font-bold text-white" id="peak-usage">5.60</div>
+                    <div class="text-sm text-gray-500 mt-2">kW - Highest recorded</div>
+                </div>
+            </div>
+            
+            <!-- Model Comparison Chart -->
+            <div class="glass-card p-6 mb-8">
+                <h3 class="heading-font text-xl font-semibold text-white mb-4">
+                    <i class="fas fa-chart-line text-blue-500 mr-2"></i>Model Performance Comparison
+                </h3>
+                <p class="text-gray-400 text-sm mb-4">ARIMA vs RNN vs LSTM - Forecast accuracy comparison</p>
+                <div class="comparison-chart-container">
+                    <canvas id="comparison-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Additional Stats -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="glass-card p-6">
+                    <h3 class="heading-font text-lg font-semibold text-white mb-3">
+                        <i class="fas fa-chart-pie text-blue-500 mr-2"></i>Model Accuracy
+                    </h3>
+                    <div id="model-accuracy" class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">ARIMA</span>
+                            <div class="flex-1 mx-4 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 rounded-full" style="width: 85%"></div>
+                            </div>
+                            <span class="text-blue-400 font-semibold">85%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">RNN</span>
+                            <div class="flex-1 mx-4 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-green-500 rounded-full" style="width: 78%"></div>
+                            </div>
+                            <span class="text-green-400 font-semibold">78%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300">LSTM</span>
+                            <div class="flex-1 mx-4 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-purple-500 rounded-full" style="width: 92%"></div>
+                            </div>
+                            <span class="text-purple-400 font-semibold">92%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card p-6">
+                    <h3 class="heading-font text-lg font-semibold text-white mb-3">
+                        <i class="fas fa-clock text-blue-500 mr-2"></i>Usage Statistics
+                    </h3>
+                    <div class="space-y-2 text-gray-300">
+                        <div class="flex justify-between py-2 border-b border-gray-700">
+                            <span>Peak Hour Usage:</span>
+                            <span class="text-yellow-400 font-semibold">6.2 kW (6 PM - 8 PM)</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-gray-700">
+                            <span>Off-Peak Usage:</span>
+                            <span class="text-green-400 font-semibold">2.8 kW (12 AM - 6 AM)</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-gray-700">
+                            <span>Weekly Average:</span>
+                            <span class="text-blue-400 font-semibold">4.15 kW</span>
+                        </div>
+                        <div class="flex justify-between py-2">
+                            <span>Monthly Trend:</span>
+                            <span class="text-red-400 font-semibold">↑ 5.2% from last month</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Alerts Module -->
+        <div id="alerts-module" class="module-content animate-fadeIn hidden">
+            <div class="mb-8">
+                <h2 class="heading-font text-4xl font-bold text-white mb-2">Alerts & Notifications</h2>
+                <p class="text-gray-400">Set thresholds and receive notifications for high consumption</p>
+            </div>
+            
+            <div class="glass-card p-6">
+                <h3 class="heading-font text-xl font-semibold text-white mb-4">
+                    <i class="fas fa-sliders-h text-blue-500 mr-2"></i>Alert Configuration
+                </h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-gray-300 block mb-2">Consumption Threshold (kW)</label>
+                        <input type="number" id="threshold-value" value="100" step="10" class="form-input w-full rounded-xl px-4 py-2 text-white">
+                    </div>
+                    
+                    <button onclick="setThreshold()" class="btn-primary px-6 py-2 rounded-xl text-white font-semibold">
+                        <i class="fas fa-save mr-2"></i>Save Alert Settings
+                    </button>
+                </div>
+                
+                <div id="alert-status" class="mt-4"></div>
+                
+                <div class="mt-8">
+                    <h4 class="heading-font text-lg font-semibold text-white mb-3">Recent Alerts</h4>
+                    <div id="recent-alerts" class="space-y-2">
+                        <p class="text-gray-500 text-center py-4">No alerts triggered yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recommendations Module -->
+        <div id="recommendations-module" class="module-content animate-fadeIn hidden">
+            <div class="mb-8">
+                <h2 class="heading-font text-4xl font-bold text-white mb-2">Smart Recommendations</h2>
+                <p class="text-gray-400">AI-powered suggestions to optimize your energy consumption</p>
+            </div>
+            
+            <div id="recommendations-list" class="space-y-4">
+                <div class="glass-card p-8 text-center">
+                    <i class="fas fa-chart-line text-5xl text-blue-500 mb-4 animate-pulse-slow"></i>
+                    <p class="text-gray-400 text-lg">Generate a forecast to receive personalized recommendations</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden items-center justify-center">
+        <div class="text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-white text-lg">Processing...</p>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let forecastChart = null;
+        let comparisonChart = null;
+        let alertThreshold = 100;
+        let uploadedData = null;
+        let recentAlerts = [];
+        let historicalDataCache = null;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadThreshold();
+            setupSidebarNavigation();
+            loadRecentAlerts();
+            loadComparisonChart();
+        });
+        
+        function setupSidebarNavigation() {
+            const sidebarItems = document.querySelectorAll('.sidebar-item[data-module]');
+            sidebarItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const module = item.getAttribute('data-module');
+                    showModule(module);
+                    sidebarItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+        }
+        
+        function showModule(moduleName) {
+            document.querySelectorAll('.module-content').forEach(module => {
+                module.classList.add('hidden');
+            });
+            document.getElementById(`${moduleName}-module`).classList.remove('hidden');
+            
+            if (moduleName === 'dashboard') {
+                loadComparisonChart();
+            } else if (moduleName === 'alerts') {
+                loadRecentAlerts();
+            }
+        }
+        
+        function showLoading() {
+            document.getElementById('loading-overlay').classList.remove('hidden');
+            document.getElementById('loading-overlay').classList.add('flex');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading-overlay').classList.add('hidden');
+            document.getElementById('loading-overlay').classList.remove('flex');
+        }
+        
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/check-auth');
+                const data = await response.json();
+                
+                if (!data.authenticated) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+            }
+        }
+        
+        async function logout() {
+            showLoading();
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/';
+            } catch (error) {
+                showToast('Logout error', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        async function uploadFile(file) {
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            showLoading();
+            document.getElementById('upload-status').classList.remove('hidden');
+            document.getElementById('upload-status').innerHTML = '<div class="text-blue-500"><i class="fas fa-spinner fa-spin mr-2"></i>Uploading...</div>';
+            
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    uploadedData = data;
+                    document.getElementById('upload-status').innerHTML = `<div class="text-green-500"><i class="fas fa-check-circle mr-2"></i>${data.message}</div>`;
+                    showDataPreview(data.preview, data.columns);
+                    showToast('File uploaded successfully!', 'success');
+                } else {
+                    document.getElementById('upload-status').innerHTML = `<div class="text-red-500"><i class="fas fa-exclamation-circle mr-2"></i>${data.message}</div>`;
+                    showToast(data.message, 'error');
+                }
+            } catch (error) {
+                document.getElementById('upload-status').innerHTML = '<div class="text-red-500">Upload failed. Please try again.</div>';
+                showToast('Upload failed', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        function showDataPreview(preview, columns) {
+            const previewDiv = document.getElementById('data-preview');
+            const thead = document.getElementById('preview-head');
+            const tbody = document.getElementById('preview-body');
+            
+            thead.innerHTML = '<tr>' + columns.slice(0, 5).map(col => `<th class="px-3 py-2 text-left">${col}</th>`).join('') + '</tr>';
+            tbody.innerHTML = preview.slice(0, 5).map(row => {
+                return '<tr>' + columns.slice(0, 5).map(col => `<td class="px-3 py-2 border-t border-gray-700">${row[col] || '-'}</td>`).join('') + '</tr>';
+            }).join('');
+            
+            previewDiv.classList.remove('hidden');
+        }
+        
+        async function runForecast() {
+            if (!uploadedData) {
+                showToast('Please upload a CSV file first', 'error');
+                showModule('upload');
+                return;
+            }
+            
+            const modelType = document.getElementById('model-select').value;
+            const forecastHours = document.getElementById('forecast-hours').value;
+            
+            showLoading();
+            const forecastBtn = document.getElementById('forecast-btn');
+            forecastBtn.disabled = true;
+            forecastBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            
+            try {
+                const response = await fetch('/api/forecast', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model_type: modelType, forecast_hours: parseInt(forecastHours) })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateMetrics(data.metrics);
+                    updateForecastChart(data.historical, data.predictions, data.timestamps);
+                    await getRecommendations(data.predictions);
+                    
+                    const maxPrediction = Math.max(...data.predictions);
+                    if (maxPrediction > alertThreshold) {
+                        addAlert(`⚠️ Alert: Predicted consumption (${maxPrediction.toFixed(2)} kW) exceeds threshold (${alertThreshold} kW)!`);
+                        showToast(`⚠️ Alert: Consumption exceeds threshold!`, 'warning');
+                    }
+                    
+                    showToast('Forecast generated successfully!', 'success');
+                    showModule('forecast');
+                } else {
+                    showToast(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Forecast error:', error);
+                showToast('Forecast failed. Please try again.', 'error');
+            } finally {
+                hideLoading();
+                forecastBtn.disabled = false;
+                forecastBtn.innerHTML = '<i class="fas fa-chart-line mr-2"></i>Generate Forecast';
+            }
+        }
+        
+        function updateMetrics(metrics) {
+            document.getElementById('metric-mae').textContent = metrics.mae;
+            document.getElementById('metric-rmse').textContent = metrics.rmse;
+            document.getElementById('metric-mape').textContent = metrics.mape + '%';
+        }
+        
+        function updateForecastChart(historical, predictions, timestamps) {
+            const canvas = document.getElementById('forecast-chart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            if (forecastChart) {
+                forecastChart.destroy();
+                forecastChart = null;
+            }
+            
+            const historicalValues = historical.values || [];
+            const predictionValues = predictions || [];
+            
+            // Store historical data for comparison chart
+            historicalDataCache = historicalValues;
+            
+            // Create labels
+            const historicalLabels = historicalValues.map((_, i) => i);
+            const predictionLabels = predictionValues.map((_, i) => historicalValues.length + i);
+            const allLabels = [...historicalLabels, ...predictionLabels];
+            
+            // Create data arrays with overlapping
+            const historicalData = [...historicalValues, ...Array(predictionValues.length).fill(null)];
+            const predictionData = [...Array(historicalValues.length).fill(null), ...predictionValues];
+            
+            forecastChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: allLabels,
+                    datasets: [
+                        {
+                            label: 'Actual Historical Data',
+                            data: historicalData,
+                            borderColor: '#60a5fa',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2.5,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            tension: 0.3,
+                            fill: false
+                        },
+                        {
+                            label: 'Predicted Forecast',
+                            data: predictionData,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                            borderWidth: 3,
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#f59e0b',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { color: '#e5e7eb', font: { family: 'Space Grotesk', size: 12 }, usePointStyle: true }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#60a5fa',
+                            bodyColor: '#e5e7eb',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    let value = context.raw;
+                                    if (value !== null) {
+                                        label += ': ' + value.toFixed(2) + ' kW';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: '#334155' },
+                            title: { display: true, text: 'Electricity Consumption (kW)', color: '#94a3b8', font: { family: 'Space Grotesk', size: 12 } },
+                            ticks: { color: '#94a3b8', callback: (value) => value + ' kW' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            title: { display: true, text: 'Time (Hours)', color: '#94a3b8', font: { family: 'Space Grotesk', size: 12 } },
+                            ticks: { color: '#94a3b8', maxTicksLimit: 10 }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function loadComparisonChart() {
+            const canvas = document.getElementById('comparison-chart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            if (comparisonChart) {
+                comparisonChart.destroy();
+                comparisonChart = null;
+            }
+            
+            // Sample data for model comparison
+            const actualData = [4.2, 4.5, 4.3, 4.8, 4.6, 4.9, 5.0, 4.7, 4.5, 4.4, 4.6, 4.8, 5.1, 4.9, 4.7, 4.6, 4.8, 5.0, 4.9, 4.7, 4.6, 4.5, 4.7, 4.9];
+            const arimaPredictions = [4.3, 4.6, 4.4, 4.7, 4.5, 4.8, 4.9, 4.6, 4.4, 4.3, 4.5, 4.7, 4.9, 4.8, 4.6, 4.5, 4.7, 4.9, 4.8, 4.6, 4.5, 4.4, 4.6, 4.8];
+            const rnnPredictions = [4.1, 4.3, 4.2, 4.5, 4.3, 4.6, 4.7, 4.4, 4.2, 4.1, 4.3, 4.5, 4.7, 4.6, 4.4, 4.3, 4.5, 4.7, 4.6, 4.4, 4.3, 4.2, 4.4, 4.6];
+            const lstmPredictions = [4.2, 4.5, 4.3, 4.8, 4.6, 4.9, 5.0, 4.7, 4.5, 4.4, 4.6, 4.8, 5.0, 4.9, 4.7, 4.6, 4.8, 5.0, 4.9, 4.7, 4.6, 4.5, 4.7, 4.9];
+            
+            const hours = Array.from({ length: 24 }, (_, i) => `Hour ${i+1}`);
+            
+            comparisonChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: hours,
+                    datasets: [
+                        {
+                            label: 'Actual Data',
+                            data: actualData,
+                            borderColor: '#60a5fa',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2.5,
+                            pointRadius: 2,
+                            tension: 0.2,
+                            fill: false
+                        },
+                        {
+                            label: 'ARIMA Predictions',
+                            data: arimaPredictions,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                            borderWidth: 2,
+                            pointRadius: 2,
+                            borderDash: [5, 5],
+                            tension: 0.2,
+                            fill: false
+                        },
+                        {
+                            label: 'RNN Predictions',
+                            data: rnnPredictions,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                            borderWidth: 2,
+                            pointRadius: 2,
+                            borderDash: [5, 5],
+                            tension: 0.2,
+                            fill: false
+                        },
+                        {
+                            label: 'LSTM Predictions',
+                            data: lstmPredictions,
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                            borderWidth: 2.5,
+                            pointRadius: 2,
+                            tension: 0.2,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { color: '#e5e7eb', font: { family: 'Space Grotesk', size: 11 }, usePointStyle: true }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#60a5fa',
+                            bodyColor: '#e5e7eb',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: '#334155' },
+                            title: { display: true, text: 'Electricity Consumption (kW)', color: '#94a3b8' },
+                            ticks: { color: '#94a3b8', callback: (value) => value + ' kW' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            title: { display: true, text: 'Time (Hours)', color: '#94a3b8' },
+                            ticks: { color: '#94a3b8', maxRotation: 45, minRotation: 45 }
+                        }
+                    }
+                }
+            });
+        }
+        
+        async function getRecommendations(predictions) {
+            const avgConsumption = predictions.reduce((a, b) => a + b, 0) / predictions.length;
+            
+            try {
+                const response = await fetch('/api/recommendations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ consumption: avgConsumption })
+                });
+                
+                const data = await response.json();
+                if (data.success) displayRecommendations(data.recommendations);
+            } catch (error) {
+                console.error('Recommendations error:', error);
+            }
+        }
+        
+        function displayRecommendations(recommendations) {
+            const container = document.getElementById('recommendations-list');
+            if (!recommendations || recommendations.length === 0) {
+                container.innerHTML = '<div class="glass-card p-8 text-center"><i class="fas fa-chart-line text-5xl text-blue-500 mb-4 animate-pulse-slow"></i><p class="text-gray-400 text-lg">Generate a forecast to receive personalized recommendations</p></div>';
+                return;
+            }
+            
+            container.innerHTML = recommendations.map(rec => `
+                <div class="glass-card border-l-4 border-blue-500 p-6">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h4 class="heading-font font-semibold text-white text-lg mb-2">${rec.title}</h4>
+                            <p class="text-gray-300 text-sm">${rec.description}</p>
+                            <p class="text-blue-400 text-sm mt-3"><i class="fas fa-chart-line mr-1"></i>Estimated Savings: ${rec.savings}</p>
+                        </div>
+                        <span class="text-xs px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 heading-font">${rec.priority.toUpperCase()} Priority</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function setThreshold() {
+            const value = parseInt(document.getElementById('threshold-value').value);
+            if (!isNaN(value) && value > 0) {
+                alertThreshold = value;
+                localStorage.setItem('alert_threshold', value);
+                document.getElementById('alert-status').innerHTML = `<div class="text-green-500"><i class="fas fa-check-circle mr-1"></i>Alert threshold set to ${value} kW</div>`;
+                showToast(`Alert threshold set to ${value} kW`, 'success');
+                setTimeout(() => {
+                    document.getElementById('alert-status').innerHTML = '';
+                }, 3000);
+            }
+        }
+        
+        function addAlert(message) {
+            recentAlerts.unshift({ message, timestamp: new Date().toLocaleString() });
+            if (recentAlerts.length > 10) recentAlerts.pop();
+            localStorage.setItem('recent_alerts', JSON.stringify(recentAlerts));
+            loadRecentAlerts();
+        }
+        
+        function loadRecentAlerts() {
+            const saved = localStorage.getItem('recent_alerts');
+            if (saved) recentAlerts = JSON.parse(saved);
+            
+            const container = document.getElementById('recent-alerts');
+            if (!container) return;
+            
+            if (recentAlerts.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-4">No alerts triggered yet</p>';
+            } else {
+                container.innerHTML = recentAlerts.map(alert => `
+                    <div class="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3">
+                        <div class="flex items-start">
+                            <i class="fas fa-bell text-blue-500 mt-1 mr-3"></i>
+                            <div class="flex-1">
+                                <p class="text-gray-300 text-sm">${alert.message}</p>
+                                <p class="text-gray-500 text-xs mt-1">${alert.timestamp}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function loadThreshold() {
+            const saved = localStorage.getItem('alert_threshold');
+            if (saved) {
+                alertThreshold = parseInt(saved);
+                const thresholdInput = document.getElementById('threshold-value');
+                if (thresholdInput) thresholdInput.value = alertThreshold;
+            }
+        }
+        
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-gradient-to-r from-blue-500 to-blue-600' : type === 'error' ? 'bg-gradient-to-r from-red-500 to-red-600' : 'bg-gradient-to-r from-yellow-500 to-yellow-600';
+            toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-xl shadow-2xl z-50 animate-fadeIn ${bgColor} text-white font-semibold`;
+            toast.innerHTML = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // Show upload module by default
+        showModule('upload');
+    </script>
+</body>
+</html>
