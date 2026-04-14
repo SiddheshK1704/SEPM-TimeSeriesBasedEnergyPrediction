@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Forecast Platform | AI-Powered Energy Predictions</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Fonts */
+        body, p, span, a, button, input, select, textarea, label {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        h1, h2, h3, h4, h5, h6, .heading-font, .bitcount-font {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        
+        /* Glass morphism effect - Enhanced */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .glass-card:hover {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 20px rgba(59, 130, 246, 0.2);
+        }
+        
+        /* Button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -10px rgba(59, 130, 246, 0.5);
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(5deg); }
+            75% { transform: translateY(10px) rotate(-5deg); }
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        @keyframes rotateSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .animate-fadeInLeft {
+            animation: fadeInLeft 0.8s ease-out;
+        }
+        
+        .animate-fadeInRight {
+            animation: fadeInRight 0.8s ease-out;
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        .animate-gradient {
+            background: linear-gradient(270deg, #3b82f6, #60a5fa, #3b82f6);
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        .animate-shimmer {
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
+        }
+        
+        /* Content area */
+        .landing-bg {
+            background: radial-gradient(ellipse at top, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .landing-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><circle cx="100" cy="100" r="2" fill="rgba(59,130,246,0.1)"/><circle cx="300" cy="200" r="3" fill="rgba(59,130,246,0.1)"/><circle cx="500" cy="150" r="2" fill="rgba(59,130,246,0.1)"/><circle cx="700" cy="300" r="3" fill="rgba(59,130,246,0.1)"/><circle cx="850" cy="100" r="2" fill="rgba(59,130,246,0.1)"/><circle cx="200" cy="500" r="3" fill="rgba(59,130,246,0.1)"/><circle cx="600" cy="600" r="2" fill="rgba(59,130,246,0.1)"/><circle cx="800" cy="700" r="3" fill="rgba(59,130,246,0.1)"/></svg>') repeat;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        /* Modal backdrop */
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+        }
+        
+        /* Form inputs */
+        .form-input {
+            background: rgba(51, 65, 85, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            transform: scale(1.02);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #60a5fa;
+        }
+        
+        /* Loading spinner */
+        .loading-spinner {
+            border: 3px solid rgba(59, 130, 246, 0.2);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="landing-bg">
+    
+    <!-- Floating particles -->
+    <div class="particle" style="width: 4px; height: 4px; top: 20%; left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="width: 6px; height: 6px; top: 60%; left: 85%; animation-delay: 1s;"></div>
+    <div class="particle" style="width: 3px; height: 3px; top: 80%; left: 20%; animation-delay: 2s;"></div>
+    <div class="particle" style="width: 5px; height: 5px; top: 40%; left: 75%; animation-delay: 0.5s;"></div>
+    <div class="particle" style="width: 7px; height: 7px; top: 15%; left: 45%; animation-delay: 1.5s;"></div>
+    
+    <!-- Navbar -->
+    <nav class="bg-slate-900/80 backdrop-blur-md border-b border-blue-500/20 fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2 group cursor-pointer">
+                    <i class="fas fa-bolt text-blue-500 text-2xl animate-pulse-slow group-hover:rotate-12 transition-transform"></i>
+                    <span class="heading-font text-xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+                        EnergyForecast
+                    </span>
+                </div>
+                
+                <!-- Auth Buttons -->
+                <div class="flex items-center space-x-3">
+                    <button onclick="openAuthModal('signin')" class="px-5 py-2 text-blue-300 hover:text-white transition-all hover:scale-105">
+                        Sign In
+                    </button>
+                    <button onclick="openAuthModal('signup')" class="px-5 py-2 btn-primary rounded-lg text-white font-semibold relative overflow-hidden group">
+                        <span class="relative z-10">Sign Up</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="pt-16 relative z-10">
+        <!-- Hero Section -->
+        <div class="relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+                <div class="text-center">
+                    <div class="animate-float inline-block mb-8">
+                        <div class="relative">
+                            <i class="fas fa-bolt text-blue-500 text-7xl"></i>
+                            <div class="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-30 animate-pulse-slow"></div>
+                        </div>
+                    </div>
+                    <h1 class="heading-font text-6xl md:text-8xl font-bold mb-6 animate-fadeInUp">
+                        <span class="bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent animate-gradient">
+                            Predict. Conserve.
+                        </span>
+                        <br>
+                        <span class="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                            Save Energy.
+                        </span>
+                    </h1>
+                    <p class="text-gray-400 text-xl max-w-2xl mx-auto mb-10 animate-fadeInUp" style="animation-delay: 0.2s;">
+                        AI-powered energy forecasting platform that helps you predict consumption, optimize usage, and reduce costs with advanced ML models.
+                    </p>
+                    <button onclick="openAuthModal('signup')" class="btn-primary px-10 py-4 rounded-xl text-white font-semibold text-lg relative overflow-hidden group animate-fadeInUp" style="animation-delay: 0.4s;">
+                        <span class="relative z-10">Get Started Free</span>
+                        <i class="fas fa-arrow-right ml-2 relative z-10"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Features Grid -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 animate-fadeInLeft">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500/30 to-blue-600/30 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-chart-line text-blue-500 text-3xl"></i>
+                    </div>
+                    <h3 class="heading-font text-2xl font-semibold text-white mb-3">Multiple Models</h3>
+                    <p class="text-gray-400 leading-relaxed">ARIMA, RNN, and LSTM models for accurate time series forecasting with high precision.</p>
+                </div>
+                
+                <div class="glass-card p-8 animate-fadeInUp" style="animation-delay: 0.2s;">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500/30 to-blue-600/30 rounded-2xl flex items-center justify-center mb-5">
+                        <i class="fas fa-database text-blue-500 text-3xl"></i>
+                    </div>
+                    <h3 class="heading-font text-2xl font-semibold text-white mb-3">Data Collection</h3>
+                    <p class="text-gray-400 leading-relaxed">Upload CSV datasets and get instant energy consumption predictions with visual insights.</p>
+                </div>
+                
+                <div class="glass-card p-8 animate-fadeInRight" style="animation-delay: 0.4s;">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500/30 to-blue-600/30 rounded-2xl flex items-center justify-center mb-5">
+                        <i class="fas fa-bell text-blue-500 text-3xl"></i>
+                    </div>
+                    <h3 class="heading-font text-2xl font-semibold text-white mb-3">Smart Alerts</h3>
+                    <p class="text-gray-400 leading-relaxed">Set thresholds and get notified when consumption exceeds limits in real-time.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- How It Works -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="glass-card p-10">
+                <h2 class="heading-font text-4xl font-bold text-white text-center mb-12 animate-fadeInUp">How It Works</h2>
+                <div class="grid md:grid-cols-4 gap-8">
+                    <div class="text-center group animate-fadeInUp" style="animation-delay: 0.1s;">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                            <span class="text-white font-bold heading-font text-2xl">1</span>
+                        </div>
+                        <p class="text-gray-300 font-semibold mt-2">Upload CSV Data</p>
+                    </div>
+                    <div class="text-center group animate-fadeInUp" style="animation-delay: 0.2s;">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                            <span class="text-white font-bold heading-font text-2xl">2</span>
+                        </div>
+                        <p class="text-gray-300 font-semibold mt-2">Select Model</p>
+                    </div>
+                    <div class="text-center group animate-fadeInUp" style="animation-delay: 0.3s;">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                            <span class="text-white font-bold heading-font text-2xl">3</span>
+                        </div>
+                        <p class="text-gray-300 font-semibold mt-2">Generate Forecast</p>
+                    </div>
+                    <div class="text-center group animate-fadeInUp" style="animation-delay: 0.4s;">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                            <span class="text-white font-bold heading-font text-2xl">4</span>
+                        </div>
+                        <p class="text-gray-300 font-semibold mt-2">Optimize Usage</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Section -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center group animate-fadeInLeft">
+                    <div class="heading-font text-5xl font-bold text-blue-500 mb-3 group-hover:scale-110 transition-transform inline-block">99.9%</div>
+                    <p class="text-gray-400">Forecast Accuracy</p>
+                </div>
+                <div class="text-center group animate-fadeInUp">
+                    <div class="heading-font text-5xl font-bold text-blue-500 mb-3 group-hover:scale-110 transition-transform inline-block">30%</div>
+                    <p class="text-gray-400">Average Energy Savings</p>
+                </div>
+                <div class="text-center group animate-fadeInRight">
+                    <div class="heading-font text-5xl font-bold text-blue-500 mb-3 group-hover:scale-110 transition-transform inline-block">24/7</div>
+                    <p class="text-gray-400">Real-time Monitoring</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
+        <div class="modal-backdrop absolute inset-0" onclick="closeAuthModal()"></div>
+        <div class="glass-card p-8 w-full max-w-md relative z-10 animate-fadeInUp">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="heading-font text-2xl font-bold text-white" id="modal-title">Sign In</h3>
+                <button onclick="closeAuthModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="auth-form" onsubmit="handleAuth(event)">
+                <div class="mb-4">
+                    <label class="text-gray-300 block mb-2">Username</label>
+                    <input type="text" id="auth-username" required class="form-input w-full rounded-xl px-4 py-3 text-white">
+                </div>
+                <div class="mb-6">
+                    <label class="text-gray-300 block mb-2">Password</label>
+                    <input type="password" id="auth-password" required class="form-input w-full rounded-xl px-4 py-3 text-white">
+                </div>
+                <button type="submit" class="btn-primary w-full py-3 rounded-xl text-white font-semibold">
+                    <span id="modal-btn-text">Sign In</span>
+                </button>
+            </form>
+            
+            <p class="text-center text-gray-400 mt-6">
+                <span id="modal-switch-text">Don't have an account?</span>
+                <button onclick="switchAuthMode()" class="text-blue-500 hover:text-blue-400 ml-2 font-semibold transition-colors" id="modal-switch-btn">Sign Up</button>
+            </p>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden items-center justify-center">
+        <div class="text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-white text-lg">Processing...</p>
+        </div>
+    </div>
+
+    <script>
+        let currentAuthMode = 'signin';
+        
+        function openAuthModal(mode) {
+            currentAuthMode = mode;
+            const modal = document.getElementById('auth-modal');
+            const title = document.getElementById('modal-title');
+            const btnText = document.getElementById('modal-btn-text');
+            const switchText = document.getElementById('modal-switch-text');
+            const switchBtn = document.getElementById('modal-switch-btn');
+            
+            if (mode === 'signin') {
+                title.textContent = 'Sign In';
+                btnText.textContent = 'Sign In';
+                switchText.textContent = "Don't have an account?";
+                switchBtn.textContent = 'Sign Up';
+            } else {
+                title.textContent = 'Sign Up';
+                btnText.textContent = 'Sign Up';
+                switchText.textContent = 'Already have an account?';
+                switchBtn.textContent = 'Sign In';
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        
+        function closeAuthModal() {
+            const modal = document.getElementById('auth-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('auth-form').reset();
+        }
+        
+        function switchAuthMode() {
+            if (currentAuthMode === 'signin') {
+                openAuthModal('signup');
+            } else {
+                openAuthModal('signin');
+            }
+        }
+        
+        function showLoading() {
+            document.getElementById('loading-overlay').classList.remove('hidden');
+            document.getElementById('loading-overlay').classList.add('flex');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading-overlay').classList.add('hidden');
+            document.getElementById('loading-overlay').classList.remove('flex');
+        }
+        
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-gradient-to-r from-blue-500 to-blue-600' : type === 'error' ? 'bg-gradient-to-r from-red-500 to-red-600' : 'bg-gradient-to-r from-yellow-500 to-yellow-600';
+            toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-xl shadow-2xl z-50 animate-fadeInUp ${bgColor} text-white font-semibold`;
+            toast.innerHTML = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        async function handleAuth(event) {
+            event.preventDefault();
+            const username = document.getElementById('auth-username').value;
+            const password = document.getElementById('auth-password').value;
+            const endpoint = currentAuthMode === 'signin' ? '/api/signin' : '/api/signup';
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (currentAuthMode === 'signin') {
+                        showToast('Login successful! Redirecting...', 'success');
+                        setTimeout(() => {
+                            window.location.href = '/dashboard';
+                        }, 1000);
+                    } else {
+                        showToast('Account created successfully! Please sign in.', 'success');
+                        openAuthModal('signin');
+                    }
+                } else {
+                    showToast(data.message, 'error');
+                }
+            } catch (error) {
+                showToast('Network error. Please try again.', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+    </script>
+</body>
+</html>
