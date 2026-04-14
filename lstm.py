@@ -16,9 +16,9 @@ TRAIN_MODEL = False
 
 #Loading datasets
 files = [
-    "USA_GA_Albany-Dougherty.County.AP.722160_TMY3_LOW.csv",
-    "USA_GA_Albany-Dougherty.County.AP.722160_TMY3_BASE.csv",
-    "USA_GA_Albany-Dougherty.County.AP.722160_TMY3_HIGH.csv"
+    "data/USA_GA_Albany-Dougherty.County.AP.722160_TMY3_LOW.csv",
+    "data/USA_GA_Albany-Dougherty.County.AP.722160_TMY3_BASE.csv",
+    "data/USA_GA_Albany-Dougherty.County.AP.722160_TMY3_HIGH.csv"
 ]
 
 dfs = []
