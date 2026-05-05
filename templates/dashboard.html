@@ -227,6 +227,26 @@
             height: 450px;
             width: 100%;
         }
+
+        /* Smart Meter additional styles */
+        .smart-meter-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.05));
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .smart-meter-card:hover {
+            border-color: rgba(59, 130, 246, 0.7);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
+            transform: scale(1.02);
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+        }
     </style>
 </head>
 <body class="content-area">
@@ -238,7 +258,7 @@
             <div class="flex items-center space-x-2 mb-10 cursor-pointer group" onclick="window.location.href='/'">
                 <i class="fas fa-bolt text-blue-500 text-2xl group-hover:animate-pulse-slow group-hover:rotate-12 transition-transform"></i>
                 <span class="heading-font text-lg font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent group-hover:from-blue-300 group-hover:to-blue-500 transition-all">
-                    EnergyForecast
+                    Smart Energy
                 </span>
             </div>
             
@@ -266,6 +286,12 @@
                 <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer" data-module="recommendations">
                     <i class="fas fa-lightbulb w-6 text-blue-400"></i>
                     <span class="ml-3 text-gray-300">Recommendations</span>
+                </div>
+
+                <!-- Smart Meter Module - Add this inside the <nav> element with other sidebar items -->
+                <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer" data-module="smartmeter">
+                    <i class="fas fa-microchip w-6 text-blue-400"></i>
+                    <span class="ml-3 text-gray-300">Smart Meter</span>
                 </div>
             </nav>
             
@@ -541,6 +567,25 @@
                 </div>
             </div>
         </div>
+
+        <!-- Smart Meter Module -->
+        <div id="smartmeter-module" class="module-content animate-fadeIn hidden">
+            <div class="mb-8">
+                <h2 class="heading-font text-4xl font-bold text-white mb-2">Smart Meter Management</h2>
+                <p class="text-gray-400">Register and manage your IoT smart meters for real-time monitoring</p>
+            </div>
+            
+            <!-- Long Rectangle Card with button -->
+            <div class="smart-meter-card rounded-2xl p-12 text-center cursor-pointer transition-all" onclick="openSmartMeterModal()">
+                <i class="fas fa-microchip text-7xl text-blue-500 mb-6 animate-pulse-slow"></i>
+                <h3 class="heading-font text-3xl font-bold text-white mb-4">Connect Your First Smart Meter</h3>
+                <p class="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">Add a smart meter to start tracking real-time energy consumption, receive instant alerts, and unlock advanced analytics for your facility.</p>
+                <button id="add-smart-meter-btn" class="btn-primary px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-xl hover:scale-105 transition-transform">
+                    <i class="fas fa-plus-circle mr-2"></i>Add Smart Meter
+                </button>
+                <div id="smart-meter-status" class="mt-6 text-blue-400 text-sm"></div>
+            </div>
+        </div>
     </main>
     
     <!-- Loading Overlay -->
@@ -550,6 +595,33 @@
             <p class="text-white text-lg">Processing...</p>
         </div>
     </div>
+
+    <!-- Modal for Smart Meter Serial Number -->
+        <div id="smartmeter-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay" style="display: none;">
+            <div class="bg-slate-800 rounded-2xl p-8 w-96 border border-blue-500/30 shadow-2xl transform transition-all scale-95 animate-fadeIn">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="heading-font text-2xl font-bold text-white">
+                        <i class="fas fa-microchip text-blue-500 mr-2"></i>Add Smart Meter
+                    </h3>
+                    <button onclick="closeSmartMeterModal()" class="text-gray-400 hover:text-white transition">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-300 mb-2 font-semibold">Smart Meter Serial Number</label>
+                    <input type="text" id="meter-serial" class="form-input w-full rounded-xl px-4 py-3 text-white" placeholder="e.g., SM-2024-XXXX-001" autocomplete="off">
+                    <p class="text-gray-500 text-xs mt-2">A unique identifier for your smart meter device.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="submitSmartMeter()" class="btn-primary flex-1 py-3 rounded-xl text-white font-semibold">
+                        <i class="fas fa-check mr-2"></i>Register Meter
+                    </button>
+                    <button onclick="closeSmartMeterModal()" class="bg-slate-700 hover:bg-slate-600 flex-1 py-3 rounded-xl text-gray-300 font-semibold transition">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
 
     <script>
         let currentUser = null;
@@ -1212,6 +1284,32 @@
         
         // Show upload module by default
         showModule('upload');
+
+        // Smart Meter Modal Functions
+        function openSmartMeterModal() {
+            document.getElementById('smartmeter-modal').style.display = 'flex';
+            document.getElementById('meter-serial').value = '';
+            document.getElementById('meter-serial').focus();
+        }
+
+        function closeSmartMeterModal() {
+            document.getElementById('smartmeter-modal').style.display = 'none';
+        }
+
+        function submitSmartMeter() {
+            const serialNumber = document.getElementById('meter-serial').value.trim();
+            if (!serialNumber) {
+                showToast('Please enter a valid serial number', 'error');
+                return;
+            }
+            // Simulate registration success
+            showToast(`Smart Meter "${serialNumber}" registered successfully!`, 'success');
+            document.getElementById('smart-meter-status').innerHTML = `<i class="fas fa-check-circle mr-1"></i> Meter ${serialNumber} added and connected.`;
+            setTimeout(() => {
+                document.getElementById('smart-meter-status').innerHTML = '';
+            }, 4000);
+            closeSmartMeterModal();
+        }
     </script>
 </body>
 </html>
